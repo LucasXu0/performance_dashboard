@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from pyecharts.charts import Bar
 from pyecharts.charts import Line
 from pyecharts import options as opts
+from pyecharts.commons.utils import JsCode
 
 import json
 from random import randrange
@@ -39,9 +40,45 @@ def bar_base() -> Bar:
     return c
 
 def memorys() -> Line:
-    line = Line().set_global_opts(
+    line = Line()
+    
+    with open('./jsons/raw_memory_records.json') as f:
+        res = json.loads(f.read())
+        memorys = list(map(lambda x: round(x / 1024.0 / 1024.0, 2), res['memorys']))
+        line.add_xaxis(range(1, len(memorys)))
+        line.add_yaxis(
+            series_name='memory',
+            y_axis=memorys,
+            itemstyle_opts=opts.ItemStyleOpts(
+                color='#2860a0'
+            ),
+            symbol='none',
+            label_opts=opts.LabelOpts(is_show=True),
+            linestyle_opts=opts.LineStyleOpts(width=2),
+            areastyle_opts=opts.AreaStyleOpts(
+                opacity=0.5,
+                color='#2860a0'
+            )
+        )
+
+        # markareas = list(map(lambda event: opts.MarkAreaItem(name=event['name'] + str(event['event']), x=(event['index'], event['index'] + 1), itemstyle_opts=opts.ItemStyleOpts(color='red', opacity=0.2)), res['vc_events']))
+        # line.set_series_opts(
+        #     markarea_opts=opts.MarkAreaOpts(
+        #         data=markareas
+        #     )
+        # )
+        
+        marklines = list(map(lambda event: opts.MarkLineItem(x=event['index'], symbol='none', name=event['name']), res['vc_events']))
+        line.set_series_opts(
+            markline_opts=opts.MarkLineOpts(
+                data=marklines,
+                symbol='none',
+            )
+        )
+
+    line.set_global_opts(
         title_opts=opts.TitleOpts(title="内存分析"),
-        tooltip_opts=opts.TooltipOpts(is_show=False),
+        tooltip_opts=opts.TooltipOpts(trigger="item", axis_pointer_type="cross"),
         xaxis_opts=opts.AxisOpts(
             type_='category',
             boundary_gap=False,
@@ -56,21 +93,6 @@ def memorys() -> Line:
             opts.DataZoomOpts(type_='inside', range_start=0, range_end=10),
         ]
     )
-    
-    with open('./jsons/raw_memory_records.json') as f:
-        res = json.loads(f.read())
-        memorys = list(map(lambda x: round(x / 1024.0 / 1024.0, 2), res['memorys']))
-        line.add_xaxis(range(1, len(memorys)))
-        line.add_yaxis(
-            series_name='memory',
-            y_axis=memorys,
-            itemstyle_opts=opts.ItemStyleOpts(
-                color='#ff4683'
-            ),
-            # label_opts=opts.LabelOpts(is_show=False),
-            # symbol='none',
-            linestyle_opts=opts.LineStyleOpts(width=2)
-        )
 
     return (line.dump_options_with_quotes())
 
