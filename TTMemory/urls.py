@@ -3,7 +3,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('bar', views.ChartViewGet, name='TTMemory'),
-    path('index', views.IndexViewGet, name='TTMemory'),
-    # path('', views.index, name='index'),
+    path('show_memory', views.show_memory, name='TTMemory'),
+    path('fetch_memory', views.fetch_memory, name='TTMemory'),
 ]

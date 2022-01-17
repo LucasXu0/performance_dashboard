@@ -18,5 +18,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('TTMemory/', include('TTMemory.urls')),
+    path('ttmemory/', include('TTMemory.urls')),
     path('admin/', admin.site.urls),
 ]
