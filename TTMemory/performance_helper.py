@@ -86,7 +86,7 @@ class PerformanceHelper:
             line.add_yaxis(
                 y_axis=memory_usage,
 
-                series_name='memory',
+                series_name='memory usage',
                 symbol='none',
                 
                 itemstyle_opts=opts.ItemStyleOpts(color='#2860a0'),
@@ -99,12 +99,12 @@ class PerformanceHelper:
             )
 
             # 
-            cpu_usage = res['cpu_usage']
+            cpu_usage = list(map(lambda x: round(x, 2), res['cpu_usage']))
             line.add_yaxis(
                 y_axis=cpu_usage,
                 yaxis_index=1,
 
-                series_name='cpu',
+                series_name='cpu usage',
                 symbol='none',
 
                 itemstyle_opts=opts.ItemStyleOpts(color='#ff3d77'),
@@ -122,6 +122,10 @@ class PerformanceHelper:
             markline_opts=opts.MarkLineOpts(
                 data=marklines,
                 symbol='none',
+                linestyle_opts=opts.LineStyleOpts(
+                    color='black',
+                    type_='dashed'
+                )
             )
         )
 
@@ -129,14 +133,14 @@ class PerformanceHelper:
 
         # 设置图表信息
         line.set_global_opts(
-            title_opts=opts.TitleOpts(title="内存分析"),
+            title_opts=opts.TitleOpts(title="性能分析"),
             tooltip_opts=opts.TooltipOpts(
                 trigger="item", 
                 axis_pointer_type="cross",
             ),
             xaxis_opts=opts.AxisOpts(
                 type_='category',
-                boundary_gap=False,
+                boundary_gap=True,
             ),
             yaxis_opts=opts.AxisOpts(
                 type_='value', 
