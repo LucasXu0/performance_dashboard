@@ -47,7 +47,7 @@ class PerformanceHelper:
     # 1. 过滤无用vc
     # 2. 聚合同一时间点数据
     @classmethod
-    def map_vc_events_to_marklines(cls, vc_events: list, white_list: list = VC_EVENTS_WHITE_LIST) -> list[opts.MarkLineItem]:
+    def map_vc_events_to_marklines(cls, vc_events: list, white_list: list = VC_EVENTS_WHITE_LIST) -> list:
         marklines = []
 
         mlt_name = ''
