@@ -15,18 +15,20 @@
 
 <script>
 $("#upload_file").click(function () {
-    var formdata = new FormData() //实例化得到一个fromdata对象
+    var formdata = new FormData()
     formdata.append('performance_json', $("#id_file")[0].files[0])
     formdata.append('name', $("#id_name").val())
     console.log($("#id_file")[0].files[0])
     $.ajax({
-        url: 'http://127.0.0.1:8000/ttmemory/upload_performance_json',
+        url: '/ttmemory/upload_performance_json',
         method: 'post',
         processData: false,
         contentType: false,
         data: formdata,
-        success: function (data) {
-            window.location.href = 'http://127.0.0.1:8000/ttmemory/show_memory'
+        dataType: "json",
+        success: function (resp) {
+            let path = resp.data.path
+            window.location.href = '/ttmemory/show_memory?path=' + path
         }
     })
 })

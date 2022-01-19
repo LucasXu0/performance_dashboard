@@ -1,3 +1,6 @@
+from datetime import timedelta
+from sqlite3 import Timestamp
+import time
 from pyecharts import options as opts
 from pyecharts.charts import Line
 
@@ -75,9 +78,25 @@ class PerformanceHelper:
     def map_memory_json_to_line(cls, json_path: str) -> Line:
         line = Line()
         
+        app_name = ''
+        bundle_id = ''
+        version = ''
+        build_number = ''
+        begin = ''
+        end = ''
+
         # 添加图表数据
         with open(json_path) as f:
             res = json.loads(f.read())
+
+            # basic info
+            app_name = res['app_name']
+            bundle_id = res['bundle_id']
+            version = res['version']
+            build_number = res['build_number']
+            begin = time.strftime('%Y-%m-%d %H:%M', time.localtime(res['begin'] + 60 * 60 * 8))
+            end = time.strftime('%Y-%m-%d %H:%M', time.localtime(res['end'] + 60 * 60 * 8))
+
             # %.2f MB
             memory_usage = list(map(lambda x: round(x / 1024.0 / 1024.0, 2), res['memory_usage']))
 
@@ -133,7 +152,7 @@ class PerformanceHelper:
 
         # 设置图表信息
         line.set_global_opts(
-            title_opts=opts.TitleOpts(title="性能分析"),
+            title_opts=opts.TitleOpts(title='性能分析 - {}'.format(app_name), subtitle='{} ~ {}\n{}-{}\n{}'.format(begin, end, version, build_number, bundle_id)),
             tooltip_opts=opts.TooltipOpts(
                 trigger="item", 
                 axis_pointer_type="cross",

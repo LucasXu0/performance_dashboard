@@ -1,16 +1,15 @@
 from django.shortcuts import render
-
-# Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-import json
-from random import randrange
-
-from .performance_helper import PerformanceHelper as PH
 from django.views.decorators.csrf import csrf_exempt
-
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.shortcuts import redirect
+
+import json
+import time
+
+from random import randrange
+from .performance_helper import PerformanceHelper as PH
 
 def response_as_json(data):
     json_str = json.dumps(data)
@@ -29,7 +28,8 @@ def json_response(data, code=200):
 JsonResponse = json_response
 
 def fetch_memory(request):
-    return JsonResponse(json.loads(PH.map_memory_json_to_line('./jsons/performance.json')))
+    path = request.GET.get('path')
+    return JsonResponse(json.loads(PH.map_memory_json_to_line(path)))
 
 def show_memory(request):
     return HttpResponse(content=open('./templates/index.html').read())
@@ -40,6 +40,7 @@ def index(request):
 @csrf_exempt
 def upload_performance_json(request):
     performance_json = request.FILES.get('performance_json')
-    default_storage.delete('./jsons/performance.json')
-    default_storage.save('./jsons/performance.json', ContentFile(performance_json.read()))
-    return HttpResponse(JsonResponse({}))
+    now = int(round(time.time() * 1000))
+    path = './jsons/performance_' + time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(now / 1000)) + '.json'
+    default_storage.save(path, ContentFile(performance_json.read()))
+    return HttpResponse(JsonResponse({'path': path}))
