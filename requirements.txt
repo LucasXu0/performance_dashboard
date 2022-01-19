@@ -1,0 +1,3 @@
+pyecharts
+Django
+djangorestframework

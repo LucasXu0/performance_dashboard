@@ -76,7 +76,8 @@ class PerformanceHelper:
 
     @classmethod
     def map_memory_json_to_line(cls, json_path: str) -> Line:
-        line = Line()
+        memroy_line = Line()
+        cpu_line = Line()
         
         app_name = ''
         bundle_id = ''
@@ -101,8 +102,8 @@ class PerformanceHelper:
             memory_usage = list(map(lambda x: round(x / 1024.0 / 1024.0, 2), res['memory_usage']))
 
             # 添加横坐标, 时间轴
-            line.add_xaxis(range(0, len(memory_usage)))
-            line.add_yaxis(
+            memroy_line.add_xaxis(range(0, len(memory_usage)))
+            memroy_line.add_yaxis(
                 y_axis=memory_usage,
 
                 series_name='memory usage',
@@ -119,7 +120,8 @@ class PerformanceHelper:
 
             # 
             cpu_usage = list(map(lambda x: round(x, 2), res['cpu_usage']))
-            line.add_yaxis(
+            cpu_line.add_xaxis(range(0, len(cpu_usage)))
+            cpu_line.add_yaxis(
                 y_axis=cpu_usage,
                 yaxis_index=1,
 
@@ -127,17 +129,20 @@ class PerformanceHelper:
                 symbol='none',
 
                 itemstyle_opts=opts.ItemStyleOpts(color='#ff3d77'),
-                label_opts=opts.LabelOpts(is_show=True),
+                label_opts=opts.LabelOpts(
+                    is_show=True,
+                    formatter='{b}%'
+                ),
                 linestyle_opts=opts.LineStyleOpts(width=2),
                 areastyle_opts=opts.AreaStyleOpts(
                     opacity=0.5,
                     color='#ff3d77'
-                )
+                ),
             )
 
         # 添加关键点
         marklines = PerformanceHelper.map_vc_events_to_marklines(res['vc_events'])
-        line.set_series_opts(
+        memroy_line.set_series_opts(
             markline_opts=opts.MarkLineOpts(
                 data=marklines,
                 symbol='none',
@@ -148,10 +153,10 @@ class PerformanceHelper:
             )
         )
 
-        line.extend_axis(yaxis=opts.AxisOpts())
+        memroy_line.extend_axis(yaxis=opts.AxisOpts())
 
         # 设置图表信息
-        line.set_global_opts(
+        memroy_line.set_global_opts(
             title_opts=opts.TitleOpts(title='性能分析 - {}'.format(app_name), subtitle='{} ~ {}\n{}-{}\n{}'.format(begin, end, version, build_number, bundle_id)),
             tooltip_opts=opts.TooltipOpts(
                 trigger="item", 
@@ -172,4 +177,4 @@ class PerformanceHelper:
             ]
         )
 
-        return line.dump_options_with_quotes()
+        return memroy_line.overlap(cpu_line).dump_options_with_quotes()
