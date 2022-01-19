@@ -3,40 +3,56 @@
 
 <head>
     <meta charset="UTF-8" />
-    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
 </head>
 
 <body style="height: 100%; margin: 0">
-    <div id="container" style="height: 100%"></div>
-    <script>
-        var dom = document.getElementById("container");
-        var chart = echarts.init(dom);
+    <h1>上传性能文件</h1>
+    <div>
+        <input type="file" id="id_file"/>
+        <button id="upload_file">提交</button>
+    </div>
+    <hr />
 
-        $(function () {
-            fetchData(chart);
-        });
-
-        function fetchData() {
-            $.ajax({
-                type: "GET",
-                url: "/ttmemory/fetch_memory?path=" + getQueryString('path'),
-                dataType: "json",
-                success: function (result) {
-                    chart.setOption(result.data);
-                },
-            });
-        }
-
-        function getQueryString(name) {
-            let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-            let r = window.location.search.substr(1).match(reg);
-            if (r != null) {
-                return decodeURIComponent(r[2]);
-            };
-            return null;
-        }
-    </script>
+    <h1>选择历史文件</h1>
+    <div>
+        <input id="fetch_files" type='search' style='width: 400px'>
+        <button id="select_file">选择</button>
+    </div>
+    
 </body>
+
+<script>
+$("#upload_file").click(function () {
+    var formdata = new FormData()
+    formdata.append('performance_json', $("#id_file")[0].files[0])
+    formdata.append('name', $("#id_name").val())
+    $.ajax({
+        url: '/ttmemory/upload_performance_json',
+        method: 'post',
+        processData: false,
+        contentType: false,
+        data: formdata,
+        dataType: "json",
+        success: function (resp) {
+            let path = resp.data.path
+            window.location.href = '/ttmemory/show_memory?path=' + path
+        }
+    })
+});
+
+$("#select_file").click(function() {
+    path = $("#fetch_files").val()
+    window.location.href = '/ttmemory/show_memory?path=' + path
+});
+
+$("#fetch_files").combobox({
+	url: "/ttmemory/fetch_performance_files",
+    method: 'get',
+    valueField: "file_name",
+    textField: "file_name"
+});
+</script>
 
 </html>

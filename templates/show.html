@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+</head>
+
+<body style="height: 100%; margin: 0">
+    <div id="container" style="height: 100%"></div>
+    <script>
+        var dom = document.getElementById("container");
+        var chart = echarts.init(dom);
+
+        $(function () {
+            fetchData(chart);
+        });
+
+        function fetchData() {
+            $.ajax({
+                type: "GET",
+                url: "/ttmemory/fetch_memory?path=" + getQueryString('path'),
+                dataType: "json",
+                success: function (result) {
+                    chart.setOption(result.data);
+                },
+            });
+        }
+
+        function getQueryString(name) {
+            let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            let r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return decodeURIComponent(r[2]);
+            };
+            return null;
+        }
+    </script>
+</body>
+
+</html>

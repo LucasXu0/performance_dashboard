@@ -7,5 +7,6 @@ urlpatterns = [
     path('fetch_memory', views.fetch_memory, name='TTMemory'),
     path('index', views.index, name='TTMemory'),
     path('upload_performance_json', views.upload_performance_json, name='TTMemory'),
+    path('fetch_performance_files', views.fetch_performance_files)
 ]
 
