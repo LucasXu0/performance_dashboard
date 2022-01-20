@@ -131,7 +131,7 @@ class PerformanceHelper:
                 itemstyle_opts=opts.ItemStyleOpts(color='#ff3d77'),
                 label_opts=opts.LabelOpts(
                     is_show=True,
-                    formatter='{b}%'
+                    formatter='{@[1]}%'
                 ),
                 linestyle_opts=opts.LineStyleOpts(width=2),
                 areastyle_opts=opts.AreaStyleOpts(
@@ -153,11 +153,15 @@ class PerformanceHelper:
             )
         )
 
-        memroy_line.extend_axis(yaxis=opts.AxisOpts())
+        memroy_line.extend_axis(yaxis=opts.AxisOpts(
+            axislabel_opts=opts.LabelOpts(
+                formatter='{value}%'
+            )
+        ))
 
         # 设置图表信息
         memroy_line.set_global_opts(
-            title_opts=opts.TitleOpts(title='性能分析 - {}'.format(app_name), subtitle='{} ~ {}\n{}-{}\n{}'.format(begin, end, version, build_number, bundle_id)),
+            title_opts=opts.TitleOpts(title='性能分析(内测版) - {}'.format(app_name), subtitle='{} ~ {}\n{}-{}\n{}'.format(begin, end, version, build_number, bundle_id)),
             tooltip_opts=opts.TooltipOpts(
                 trigger="item", 
                 axis_pointer_type="cross",
