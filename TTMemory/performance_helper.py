@@ -47,22 +47,30 @@ class PerformanceHelper:
     # 1. 过滤无用vc
     # 2. 聚合同一时间点数据
     @classmethod
-    def map_vc_events_to_marklines(cls, vc_events: list, white_list: list = VC_EVENTS_WHITE_LIST) -> list:
+    def map_events_to_marklines(cls, events: list, filter_type = 1, white_list = VC_EVENTS_WHITE_LIST) -> list:
+
+        if filter_type != 1:
+            white_list = []
+        
         marklines = []
 
         mlt_name = ''
 
-        vc_events = [v for v in vc_events if v['name'] in white_list]
+        events = [v for v in events if 'type' not in v.keys() or ('type' in v.keys() and v['type'] != filter_type)]
+        events = [v for v in events if v['name'] in white_list]
 
-        for i in range(0, len(vc_events)):
-            vc_event = vc_events[i]
-            name = vc_event['name']
-            index = vc_event['index']
-            event_type = TTVCEventType(vc_event['event'])
+        for i in range(0, len(events)):
+            event = events[i]
+            name = event['name']
+            index = event['index']
 
-            mlt_name += name + ' ' + event_type.toStr() + ' '
+            mlt_name += name + ' '
 
-            if i < len(vc_events) - 1 and index == vc_events[i+1]['index']:
+            if 'ext_type' in event.keys():
+                ext_type = TTVCEventType(event['ext_type'])
+                mlt_name += ext_type.toStr() + ' '
+
+            if i < len(events) - 1 and index == events[i+1]['index']:
                 continue
 
             marklines.append(opts.MarkLineItem(
@@ -75,7 +83,7 @@ class PerformanceHelper:
         return marklines
 
     @classmethod
-    def map_memory_json_to_line(cls, json_path: str) -> Line:
+    def map_memory_json_to_line(cls, json_path: str, filter_type) -> Line:
         memroy_line = Line()
         cpu_line = Line()
         
@@ -141,7 +149,9 @@ class PerformanceHelper:
             )
 
         # 添加关键点
-        marklines = PerformanceHelper.map_vc_events_to_marklines(res['vc_events'])
+        if not filter_type:
+            filter_type = 1
+        marklines = PerformanceHelper.map_events_to_marklines(res['vc_events'], filter_type)
         memroy_line.set_series_opts(
             markline_opts=opts.MarkLineOpts(
                 data=marklines,

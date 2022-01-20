@@ -30,7 +30,8 @@ JsonResponse = json_response
 
 def fetch_memory(request):
     path = request.GET.get('path')
-    return JsonResponse(json.loads(PH.map_memory_json_to_line(path)))
+    filter_type = request.GET.get('filter_type')
+    return JsonResponse(json.loads(PH.map_memory_json_to_line(path, filter_type)))
 
 def show_memory(request):
     return HttpResponse(content=open('./templates/show.html').read())
