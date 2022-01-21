@@ -49,38 +49,59 @@ class PerformanceHelper:
     @classmethod
     def map_events_to_marklines(cls, events: list, filter_type = 1, white_list = VC_EVENTS_WHITE_LIST) -> list:
 
-        if filter_type != 1:
-            white_list = []
-        
         marklines = []
 
         mlt_name = ''
 
-        events = [v for v in events if 'type' not in v.keys() or ('type' in v.keys() and v['type'] != filter_type)]
-        events = [v for v in events if v['name'] in white_list]
+        events = [v for v in events if v['type'] == int(filter_type)]
+        if filter_type != 1:
+            events = [v for v in events if v['name'] in white_list]
 
         for i in range(0, len(events)):
             event = events[i]
             name = event['name']
-            index = event['index']
+            time = event['time']
 
             mlt_name += name + ' '
 
-            if 'ext_type' in event.keys():
-                ext_type = TTVCEventType(event['ext_type'])
-                mlt_name += ext_type.toStr() + ' '
+            if 'event' in event.keys():
+                event = TTVCEventType(event['event'])
+                mlt_name += event.toStr() + ' '
 
-            if i < len(events) - 1 and index == events[i+1]['index']:
+            if i < len(events) - 1 and time == events[i+1]['time']:
                 continue
 
             marklines.append(opts.MarkLineItem(
-                x=index,
+                x=time,
                 name=mlt_name,
                 symbol='none',
             ))
             mlt_name = ''
 
         return marklines
+
+    @classmethod
+    def map_performance_records(cls, performance_records):
+        cpu_usage = []
+        memory_usage = []
+
+        i = 1
+        step = 10
+        while i < len(performance_records):
+
+            p_time = performance_records[i-1]['time']
+            p_memory = round(performance_records[i-1]['memory'] / 1024.0 / 1024.0, 2)
+            p_cpu = round(performance_records[i-1]['cpu'], 2)
+            c_time = performance_records[i]['time']
+
+            j = 0
+            while j < int((c_time - p_time) / step + 0.5):
+                cpu_usage.append(p_cpu)
+                memory_usage.append(p_memory)
+                j += 1
+
+            i += 1
+        return cpu_usage, memory_usage
 
     @classmethod
     def map_memory_json_to_line(cls, json_path: str, filter_type) -> Line:
@@ -103,11 +124,13 @@ class PerformanceHelper:
             bundle_id = res['bundle_id']
             version = res['version']
             build_number = res['build_number']
+            performance_records = res['performance_records']
+            duration = (int)((res['end'] - res['begin']) * 1000)
+
+            cpu_usage, memory_usage = PerformanceHelper.map_performance_records(performance_records)
+
             begin = time.strftime('%Y-%m-%d %H:%M', time.localtime(res['begin'] + 60 * 60 * 8))
             end = time.strftime('%Y-%m-%d %H:%M', time.localtime(res['end'] + 60 * 60 * 8))
-
-            # %.2f MB
-            memory_usage = list(map(lambda x: round(x / 1024.0 / 1024.0, 2), res['memory_usage']))
 
             # 添加横坐标, 时间轴
             memroy_line.add_xaxis(range(0, len(memory_usage)))
@@ -127,7 +150,6 @@ class PerformanceHelper:
             )
 
             # 
-            cpu_usage = list(map(lambda x: round(x, 2), res['cpu_usage']))
             cpu_line.add_xaxis(range(0, len(cpu_usage)))
             cpu_line.add_yaxis(
                 y_axis=cpu_usage,
@@ -151,7 +173,7 @@ class PerformanceHelper:
         # 添加关键点
         if not filter_type:
             filter_type = 1
-        marklines = PerformanceHelper.map_events_to_marklines(res['vc_events'], filter_type)
+        marklines = PerformanceHelper.map_events_to_marklines(res['events'], filter_type)
         memroy_line.set_series_opts(
             markline_opts=opts.MarkLineOpts(
                 data=marklines,

@@ -20,7 +20,7 @@
         function fetchData() {
             $.ajax({
                 type: "GET",
-                url: "/ttmemory/fetch_memory?path=" + getQueryString('path'),
+                url: "/ttmemory/fetch_memory?path=" + getQueryString('path') + "&filter_type=" + getQueryString('filter_type'), 
                 dataType: "json",
                 success: function (result) {
                     chart.setOption(result.data);
