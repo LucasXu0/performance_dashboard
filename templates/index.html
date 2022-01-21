@@ -37,7 +37,7 @@ $("#upload_file").click(function () {
         dataType: "json",
         success: function (resp) {
             let path = resp.data.path
-            window.location.href = '/ttmemory/show_memory?path=' + path
+            window.location.href = '/ttmemory/show_memory?path=' + path + '&filter_type=0'
         }
     })
 });
