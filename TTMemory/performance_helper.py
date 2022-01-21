@@ -68,15 +68,14 @@ class PerformanceHelper:
             event = events[i]
             name = event['name']
             time = int(math.ceil(event['time'] / 10))
+            event = TTVCEventType(event['event'])
+            
+            mlt_name += name + ' ' + event.toStr() + ' '
 
-            mlt_name += name + ' '
-
-            if 'event' in event.keys():
-                event = TTVCEventType(event['event'])
-                mlt_name += event.toStr() + ' '
-
-            if i < len(events) - 1 and time == events[i+1]['time']:
-                continue
+            if i < len(events) - 1:
+                next_time = int(math.ceil(events[i+1]['time'] / 10))
+                if time == next_time:
+                    continue
 
             marklines.append(opts.MarkLineItem(
                 x=time,
@@ -215,9 +214,9 @@ class PerformanceHelper:
                 splitline_opts=opts.SplitLineOpts(is_show=True),
             ),
             datazoom_opts=[
-                opts.DataZoomOpts(range_start=0, range_end=20),
-                opts.DataZoomOpts(type_='inside', range_start=0, range_end=20),
-            ]
+                opts.DataZoomOpts(range_start=0, range_end=100),
+                opts.DataZoomOpts(type_='inside', range_start=0, range_end=100),
+            ],
         )
 
         return memroy_line.overlap(cpu_line).dump_options_with_quotes()
