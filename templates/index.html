@@ -44,7 +44,7 @@ $("#upload_file").click(function () {
 
 $("#select_file").click(function() {
     path = $("#fetch_files").val()
-    window.location.href = '/ttmemory/show_memory?path=' + path
+    window.location.href = '/ttmemory/show_memory?path=' + path + '&filter_type=0'
 });
 
 $("#fetch_files").combobox({

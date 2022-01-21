@@ -7,9 +7,10 @@ from pyecharts.charts import Line
 from enum import IntEnum
 
 import json
-
+import math
 
 class TTVCEventType(IntEnum):
+    TTVCEventTypeDefault = -1,
     TTVCEventTypeInit = 1,
     TTVCEventTypeViewDidLoad = 2,
     TTVCEventTypeViewWillAppear = 3,
@@ -19,7 +20,9 @@ class TTVCEventType(IntEnum):
     TTVCEventTypeDealloc = 7,
 
     def toStr(self) -> str:
-        if self == TTVCEventType.TTVCEventTypeInit:
+        if self == TTVCEventType.TTVCEventTypeDefault:
+            return ''
+        elif self == TTVCEventType.TTVCEventTypeInit:
             return 'init'
         elif self == TTVCEventType.TTVCEventTypeViewDidLoad:
             return 'viewDidLoad'
@@ -58,11 +61,13 @@ class PerformanceHelper:
             events = [v for v in events if v['type'] == int(filter_type)]
         if filter_type == 1:
             events = [v for v in events if v['name'] in white_list]
+        if filter_type == 2:
+            events = [v for v in events if v['event'] == -1]
 
         for i in range(0, len(events)):
             event = events[i]
             name = event['name']
-            time = event['time']
+            time = int(math.ceil(event['time'] / 10))
 
             mlt_name += name + ' '
 
