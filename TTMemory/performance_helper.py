@@ -53,7 +53,9 @@ class PerformanceHelper:
 
         mlt_name = ''
 
-        events = [v for v in events if v['type'] == int(filter_type)]
+        filter_type = int(filter_type)
+        if (filter_type != 0):
+            events = [v for v in events if v['type'] == int(filter_type)]
         if filter_type == 1:
             events = [v for v in events if v['name'] in white_list]
 
