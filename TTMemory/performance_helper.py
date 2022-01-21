@@ -62,7 +62,7 @@ class PerformanceHelper:
         if filter_type == 1:
             events = [v for v in events if v['name'] in white_list]
         if filter_type == 2:
-            events = [v for v in events if v['event'] == -1]
+            events = [v for v in events if int(v['event']) == -1]
 
         for i in range(0, len(events)):
             event = events[i]
