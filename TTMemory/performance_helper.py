@@ -200,7 +200,7 @@ class PerformanceHelper:
 
         # 设置图表信息
         memroy_line.set_global_opts(
-            title_opts=opts.TitleOpts(title='性能分析(内测版) - {}'.format(app_name), subtitle='{} ~ {}\n{} {}-{}\n{}'.format(begin, end, device, version, build_number, bundle_id)),
+            title_opts=opts.TitleOpts(title='性能分析(内测版) - {}'.format(app_name), subtitle='{} ~ {}\n\n{}\n\n{} / {}-{}'.format(begin, end, bundle_id, device, version, build_number)),
             tooltip_opts=opts.TooltipOpts(
                 trigger="item", 
                 axis_pointer_type="cross",
